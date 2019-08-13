@@ -5,7 +5,7 @@ import './App.css';
 
 const API = 'http://localhost:8000/api';
 const DEFAULT_QUERY = '/timesheet/create?hey=1&jeff=2';
-const COUNTER_QUERY = '/counter'
+const TIMER_QUERY = '/timer'
 
 class App extends Component {
 
@@ -15,21 +15,23 @@ class App extends Component {
     this.state = {
         jeff: 1,
         counter: null,
+        hey: 'jeff',
     };
   }
 
   componentDidMount() {
-    fetch(API + DEFAULT_QUERY)
-      .then(response => response.json())
-      .then(data => this.setState({ 
-          jeff: data.jeff
-      }))
+
+    // fetch(API + DEFAULT_QUERY)
+    //   .then(response => response.json())
+    //   .then(data => this.setState({ 
+    //       jeff: data.jeff
+    //   }))
 
 
-    this.interval = setInterval(() => fetch(API + COUNTER_QUERY)
+    this.interval = setInterval(() => fetch(API + TIMER_QUERY)
       .then(response => response.json())
-      .then(data => this.setState({ 
-          counter: data.counter
+      .then(data => this.setState({
+          counter: data.state
       })), 1000);
 
   }
@@ -44,11 +46,7 @@ class App extends Component {
 
     return (
         <div>
-            <h1> hello there what </h1>
-            <p> oh you can only have one </p>
-            <p> HERE"S A CHANGE </p>
-            <p> another one </p>
-            <p> another one </p>
+            <h1> hello world </h1>
             <p> {data.jeff} </p>
             <p> {data.counter} </p>
         </div>

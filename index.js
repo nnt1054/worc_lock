@@ -1,13 +1,6 @@
 const express = require('express');
 const path = require('path');
 
-// var counter = 1;
-// function myFunc(arg) {
-//   counter++;
-//   console.log(`counter is now ` + counter);
-// }
-// setInterval(myFunc, 1000);
-
 const states = {
     IDLE: {
         START: 'idle.start'
@@ -20,7 +13,6 @@ var state = states.IDLE;
 timer = null;
 
 function timerHandler(action) {
-
 
     switch(state[action]) {
         case states.IDLE.START:
@@ -54,11 +46,6 @@ function timerHandler(action) {
     return 1;
 }
 
-// Idle.start
-// Working.stop
-
-
-
 
 // Connect to the database here!
 var sqlite3 = require('sqlite3').verbose();
@@ -67,18 +54,22 @@ db.serialize(function() {
     db.run("CREATE TABLE IF NOT EXISTS timesheet (start DATETIME, end DATETIME, tasks TEXT, rating INT)");
 });
 
-
-var insertStatement = db.prepare("INSERT INTO timesheet VALUES (?,?,?,?)");
-var updateStatement = db.prepare("UPDATE timesheet SET start = ?, end = ?, tasks = ?, rating = ? WHERE rowid = ?");
-var deleteStatement = db.prepare("DELETE FROM timesheet WHERE rowid = ?");
-
 const app = express();
 
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", ["http://localhost:3000"]);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
+app.get('/test', function(req, res) {
+    res.send('pepega');
+})
 
-app.route('/timer')
+app.route('/api/timer')
     .get(function(req, res) {
         switch(state) {
             case states.IDLE:
@@ -101,7 +92,6 @@ app.route('/timer')
                 res.send(action + ' successful!');
         }
     })
-
 
 app.route('/api/timesheet')
     .get(function (req, res) {
@@ -133,8 +123,7 @@ app.route('/api/timesheet')
         })
     })
 
-
-app.route('/api/timesheet/:rowid([0-9])')
+app.route('/api/timesheet/:rowid([0-9]+)')
     .get(function (req, res) {
         var rowid = req.params.rowid;
         db.get("SELECT rowid, * FROM timesheet WHERE rowid = $rowid", {
