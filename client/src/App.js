@@ -46,11 +46,25 @@ const useStyles = theme => ({
         height: 240,
     },
     button: {
-        margin: theme.spacing(1),
+        // margin: theme.spacing(1),
     },
     icon: {
         margin: theme.spacing(2),
     },
+    textField: {
+        // height: '32px',
+    },
+      MuiSelect: {
+        // see https://github.com/mui-org/material-ui/issues/9826
+        select: {
+          padding: undefined,
+          paddingRight: theme.spacing.unit * 4,
+          height: undefined,
+        },
+        selectMenu: {
+          lineHeight: undefined,
+        },
+      },
     
 });
 
