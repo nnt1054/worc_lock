@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
 // import { withStyles } from '@material-ui/core/styles';
 
+import Grid from '@material-ui/core/Grid';
+
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+
+import IconButton from '@material-ui/core/IconButton';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import AddAlarmIcon from '@material-ui/icons/AddAlarm'
+
 import Title from './Title';
 
 // // Generate Order Data
@@ -26,17 +34,74 @@ import Title from './Title';
 //     marginTop: theme.spacing(3),
 //   },
 // }));
+const API = 'http://localhost:8000/api';
+const TIMESHEET_QUERY = '/timesheet'
+
 
 class Timesheet extends Component {
 
-    render() {
-        console.log(this.props.data); 
+    constructor(props) {
+        super(props);
+        
+        this.state = {
+            timesheet: [],
+        }
+    }
 
+    componentDidMount() {
+        this.refreshTimesheet();
+    }
+
+    refreshTimesheet() {
+        fetch(API + TIMESHEET_QUERY)
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 1) {
+                    this.setState({
+                        timesheet: data.rows,
+                    })
+                }
+            })
+    }
+
+    sendDeleteRequest(rowid) {
+        fetch(API + TIMESHEET_QUERY + '/' + rowid, {
+            method: 'delete',
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 1) {
+                    this.refreshTimesheet()
+                }
+            })
+    }
+
+    tableClick(row,column,event) {
+        // console.log(row, column, event);
+    }
+
+    render() {
+
+        if (this.props.refresh) {
+            this.refreshTimesheet();            
+        }
+
+        const { classes } = this.props;
 
         return (
             <React.Fragment>
-                <Title> Timesheet </Title>
-                <Table size="medium">
+                <Grid container spacing={3} justify='space-between' alignItems='center'>
+                    <Grid item>
+                        <Title> Timesheet </Title>
+                    </Grid>
+                    <Grid item>
+                        <IconButton color={'primary'} className={classes.button} aria-label="delete">
+                            <AddAlarmIcon />
+                        </IconButton>
+                    </Grid>
+                </Grid>
+
+                <Table size="medium" onClick={this.tableClick}>
                     <TableHead>
                         <TableRow>
                             <TableCell>Date</TableCell>
@@ -44,17 +109,15 @@ class Timesheet extends Component {
                             <TableCell>End Time</TableCell>
                             <TableCell>Duration</TableCell>
                             <TableCell>Rating</TableCell>
-                            <TableCell align="right">Task(s)</TableCell>
+                            <TableCell>Task(s)</TableCell>
+                            <TableCell align="right"></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {
-                            this.props.data.map(row => {
+                            this.state.timesheet.map(row => {
                                 var start = new Date(row.start);
                                 var end = new Date(row.end);
-                                var duration = end - start
-                                var hours = Math.floor(duration / (1000 * 60 * 60) % 60);
-                                var minutes = Math.floor(duration / (1000 * 60) % 60);
                                 var duration = (function(start, end) {
                                     var ms = end - start
                                     var hr = Math.floor(ms / (1000 * 60 * 60) % 60);
@@ -73,7 +136,15 @@ class Timesheet extends Component {
                                     <TableCell>{start.toLocaleTimeString()}</TableCell>
                                     <TableCell>{duration}</TableCell>
                                     <TableCell>{2}</TableCell>
-                                    <TableCell align="right">worc_lock</TableCell>
+                                    <TableCell>worc_lock</TableCell>
+                                    <TableCell align="right">
+                                        <IconButton color={'primary'} className={classes.button} aria-label="delete">
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton color={'secondary'} className={classes.button} aria-label="delete" onClick={() => this.sendDeleteRequest(row.rowid)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </TableCell>
                                     </TableRow>
                                 )
                             })

@@ -44,7 +44,13 @@ const useStyles = theme => ({
     },
     fixedHeight: {
         height: 240,
-    }
+    },
+    button: {
+        margin: theme.spacing(1),
+    },
+    icon: {
+        margin: theme.spacing(2),
+    },
     
 });
 
@@ -59,18 +65,22 @@ class App extends Component {
 
     constructor(props) {
         super(props);
-
+        
+        this.refresh = false;        
         this.state = {
             timerState: 'hey :)',
+            startTime: new Date(),
             timesheet: [],
         };
+
+        this.refreshApp = this.refreshApp.bind(this);
     }
 
     componentDidMount() {
         this.interval = setInterval(() => fetch(API + TIMER_QUERY)
             .then(response => response.json())
             .then(data => {
-                if (data.state != this.state.timerState) {
+                if (data.state !== this.state.timerState) {
                     this.setState({
                         timerState: data.state,
                     })   
@@ -93,10 +103,16 @@ class App extends Component {
     }
 
 
+    refreshApp() {
+        this.refresh = true;
+        this.forceUpdate();
+        this.refresh = false;
+    }
+        
+
     render() {
         const state = this.state.timerState;
         const { classes } = this.props;
-        const timesheetData = this.state.timesheet;
         const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
         return (
@@ -116,7 +132,7 @@ class App extends Component {
                             {/* Work Clock */ }
                             <Grid item xs={12}>
                                 <Paper className={classes.paper}>
-                                    <WorkClock> 00:00:00 </WorkClock>
+                                    <WorkClock refreshApp={this.refreshApp}/>
                                 </Paper>
                             </Grid>
                             {/* Timer Series Chart*/}
@@ -131,10 +147,10 @@ class App extends Component {
                                     <span> { state } </span>
                                 </Paper>
                             </Grid>
-                            {/* Timsheet */ }
+                            {/* Timesheet */ }
                             <Grid item xs={12}>
                                 <Paper className={classes.paper}>
-                                    <Timesheet data={this.state.timesheet} />
+                                    <Timesheet data={this.state.timesheet} classes={classes} refresh={this.refresh}/>
                                 </Paper>
                             </Grid>
                         </Grid>

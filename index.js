@@ -87,15 +87,15 @@ app.route('/api/timer')
         var result = timerHandler(action);
         switch(result) {    
             case -1:
-                res.send(action + ' failed!');
+                res.json({result: result});
             case 1:
-                res.send(action + ' successful!');
+                res.json({result: result});
         }
     })
 
 app.route('/api/timesheet')
     .get(function (req, res) {
-        db.all("SELECT rowid, * FROM timesheet", (err, rows) => {
+        db.all("SELECT rowid, * FROM timesheet ORDER BY start DESC", (err, rows) => {
             res.json({result: 1, rows: rows});
         })
     })
