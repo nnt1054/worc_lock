@@ -125,7 +125,7 @@ class Timesheet extends Component {
                     </Grid>
                 </Grid>
 
-                <Table size="large" onClick={this.tableClick}>
+                <Table size="medium" onClick={this.tableClick}>
                     <TableHead>
                         <TableRow>
                             <TableCell>Date</TableCell>

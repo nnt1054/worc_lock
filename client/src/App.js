@@ -55,17 +55,17 @@ const useStyles = theme => ({
     textField: {
         // height: '32px',
     },
-      MuiSelect: {
-        // see https://github.com/mui-org/material-ui/issues/9826
+    MuiSelect: {
+    // see https://github.com/mui-org/material-ui/issues/9826
         select: {
-          padding: undefined,
-          paddingRight: theme.spacing.unit * 4,
-          height: undefined,
+            padding: undefined,
+            paddingRight: theme.spacing(4),
+            height: undefined,
         },
         selectMenu: {
-          lineHeight: undefined,
+            lineHeight: undefined,
         },
-      },
+    },
     
 });
 
@@ -104,9 +104,45 @@ class App extends Component {
             .then(data => {
                 this.setState({
                     weekHours: data.hours,
-                    chartData: data.data,
+                    chartData: this.formatChartDate(data.data),
                 })
             })
+    }
+
+    formatChartDate(data) {
+        var result = []
+        var today = new Date();
+        var dayDuration = 24 * 60 * 60 * 1000;
+        for (var i = 0; i < 7; i++) {
+            var day = new Date(today.getTime() - (dayDuration * i));
+            var dayKey = day.toDateString();
+            if (dayKey in data) {
+                var ratings = data[dayKey].ratings
+                if (ratings.length < 1) {
+                    var rating = null;
+                } else if (ratings.length == 1 ) {
+                    var rating = ratings[0]
+                } else {
+                    var sum = ratings.reduce(function(a, b) { return a + b; });
+                    var rating = sum / ratings.length;
+                }
+                var duration = data[dayKey].duration / (60 * 60 * 1000);
+                duration = Math.round(duration * 100) / 100;
+                result.push({
+                    day: dayKey,
+                    duration: duration,
+                    rating: rating,
+                })
+            } else {
+                result.push({
+                    day: dayKey,
+                    duration: 0,
+                    rating: null,
+                })
+            }
+        }
+
+        return result.reverse();
     }
 
     componentWillUnmount() {
@@ -114,7 +150,6 @@ class App extends Component {
     }
 
     render() {
-        const state = this.state.timerState;
         const { classes } = this.props;
         const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
@@ -124,7 +159,7 @@ class App extends Component {
                 <AppBar className={classes.appBar}>
                     <Toolbar className={classes.toolbar}>
                         <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                            ADD ME ON LINKEDIN
+                            Work Clock
                         </Typography>
                     </Toolbar>
                 </AppBar>

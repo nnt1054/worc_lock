@@ -179,27 +179,40 @@ app.get('/api/statistics', (req,res) => {
     var today = new Date();
     today.setHours(0); today.setMinutes(0);
     var week = 7 * 24 * 60 * 60 * 1000;
+    var twoWeeks = new Date(today.getTime() - (week * 2))
     var lastMonday = new Date(today.getTime() - week);
     while (lastMonday.getDay() != 1) {
         lastMonday = new Date(lastMonday.getTime() + 24 * 60 * 60 * 1000);
     }
-    db.all("SELECT rowid, * FROM timesheet WHERE start > $lastMonday ORDER BY start DESC", {
-        $lastMonday: lastMonday,
+    db.all("SELECT rowid, * FROM timesheet WHERE start > $twoWeeks ORDER BY start DESC", {
+        $twoWeeks: twoWeeks,
     }, (err, rows) => {
-        var duration = 0;
+        var totalDuration = 0;
         var data = {}
         rows.map(row => {
-            duration = duration + (row.end - row.start);
+            var dayDuration = row.end - row.start
+            if (row.start > lastMonday) {
+                totalDuration = totalDuration + dayDuration;
+            }
+            
             var day = new Date(row.start);
             var dayKey = day.toDateString();
             if (dayKey in data) {
-                data[dayKey] += duration;
+                if (row.rating) {
+                    data[dayKey].ratings.push(row.rating)
+                }
+                data[dayKey].duration += dayDuration;
             } else {
-                data[dayKey] = duration;
+                data[dayKey] = {};
+                data[dayKey].ratings = [];
+                if (row.rating) {
+                    data[dayKey].ratings.push(row.rating)
+                }
+                data[dayKey].duration = dayDuration;
             }
         })
-        var hours = duration / (60 * 60 * 1000);
-        res.json({result: 1, hours: hours, duration: duration, rows: rows, data: data});
+        var hours = totalDuration / (60 * 60 * 1000);
+        res.json({result: 1, hours: hours, duration: totalDuration, rows: rows, data: data});
     })
 })
 

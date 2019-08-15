@@ -10,6 +10,7 @@ class TimeSeriesChart extends Component {
 
     constructor(props) {
         super(props);
+        
     }
 
     componentDidMount() {
@@ -19,33 +20,9 @@ class TimeSeriesChart extends Component {
     }
 
     render() {
-        var data = [
-            {
-                name: 'Page A', uv: 4000, pv: 2400, amt: 2400,
-            },
-            {
-                name: 'Page B', uv: 3000, pv: 1398, amt: 2210,
-            },
-            {
-                name: 'Page C', uv: 2000, pv: 9800, amt: 2290,
-            },
-            {
-                name: 'Page D', uv: 2780, pv: 3908, amt: 2000,
-            },
-            {
-                name: 'Page E', uv: 1890, pv: 4800, amt: 2181,
-            },
-            {
-                name: 'Page F', uv: 2390, pv: 3800, amt: 2500,
-            },
-            {
-                name: 'Page G', uv: 3490, pv: 4300, amt: 2100,
-            },
-        ]
-
         return (
             <React.Fragment>
-                <Title> Hours Worked </Title>
+                <Title> Summary </Title>
                 <ResponsiveContainer>
                     <LineChart
                         margin={{
@@ -54,13 +31,15 @@ class TimeSeriesChart extends Component {
                             bottom: 0,
                             left: 0,
                         }}
-                        data={data}
+                        data={this.props.data}
                     >
-                        <XAxis dataKey="name" />
-                        <YAxis />
+                        <XAxis dataKey="day" />
+                        <YAxis yAxisId="duration" domain={[0, 'dataMax']} />
+                        <YAxis yAxisId="rating" domain={[0, 10]} orientation="right" />
                         <Tooltip />
                         <Legend />
-                        <Line type="monotone" dataKey="pv" stroke="#8884d8" strokeWidth={3} activeDot={{ r: 8 }} />
+                        <Line type="monotone" yAxisId="duration" dataKey="duration" stroke="#8884d8" strokeWidth={3} activeDot={{ r: 8 }} connectNulls />
+                        <Line type="monotone" yAxisId="rating" dataKey="rating" stroke="red" strokeWidth={3} activeDot={{ r: 8 }} connectNulls />
                     </LineChart>
                 </ResponsiveContainer>
             </React.Fragment>
