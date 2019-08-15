@@ -21,6 +21,8 @@ class EditableTableRow extends Component {
         super(props);
 
         var date = new Date(this.props.row.start);
+        date.setMinutes(0);
+        date.setHours(0);
         var start = new Date(this.props.row.start);
         var end = new Date(this.props.row.end);
 
@@ -115,8 +117,8 @@ class EditableTableRow extends Component {
     };
 
     dateOnChange(e) {
-        // var result = e.target.value;
         var newDate = e.target.valueAsDate;
+        newDate = new Date(newDate.getTime() + 24 * 60 * 60 * 1000);
         var valid = this.state.valid;
         if (!newDate) {
             valid.date = false;
@@ -138,8 +140,8 @@ class EditableTableRow extends Component {
         newEnd.setMinutes(endMin);
         this.setState({
             date: newDate,
-            start: start,
-            end: end,
+            start: newStart,
+            end: newEnd,
             valid: valid,
         })
     }
@@ -291,7 +293,7 @@ class EditableTableRow extends Component {
                     <TextField
                         id="date"
                         type="date"
-                        defaultValue={start.toJSON().slice(0,10)}
+                        defaultValue={date.toJSON().slice(0,10)}
                         onChange={this.dateOnChange}
                         className={classes.textField}
                     />

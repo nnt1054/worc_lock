@@ -57,7 +57,6 @@ class Timesheet extends Component {
     }
 
     sendUpdateRequest(rowid, start, end, rating, tasks) {
-        console.log(start, end)
         if ( !start || !end ) {
             console.log('invalid!')
             return;

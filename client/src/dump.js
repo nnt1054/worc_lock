@@ -93,3 +93,7 @@
 
 
 {"rowid":4,"start":1565780005986,"end":1565780093006,"tasks":null,"rating":null},{"rowid":3,"start":1565686397654,"end":1565688968352,"tasks":null,"rating":null}]}
+
+
+{"Thu Aug 15 2019 00:00:07 GMT-0800 (GMT-08:00)": 420000,
+ "Thu Aug 15 2019 00:00:40 GMT-0800 (GMT-08:00)":2220000}

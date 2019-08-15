@@ -9,9 +9,10 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 
-import Timesheet from './Timesheet';
+import Title from './Title';
 import WorkClock from './WorkClock';
-
+import TimeSeriesChart from './TimeSeriesChart'
+import Timesheet from './Timesheet';
 
 const useStyles = theme => ({
     root: {
@@ -71,6 +72,7 @@ const useStyles = theme => ({
 
 const API = 'http://localhost:8000/api';
 const TIMER_QUERY = '/timer'
+const STAT_QUERY = '/statistics'
 
 class App extends Component {
 
@@ -79,8 +81,9 @@ class App extends Component {
         super(props);
         
         this.state = {
-            timerState: 'hey :)',
-            startTime: new Date(),
+            timerState: 'haha',
+            weekHours: 0,
+            chartData: [],
         };
 
     }
@@ -95,6 +98,15 @@ class App extends Component {
                     })
                 }
             }), 1000);
+
+        fetch(API + STAT_QUERY)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    weekHours: data.hours,
+                    chartData: data.data,
+                })
+            })
     }
 
     componentWillUnmount() {
@@ -126,16 +138,19 @@ class App extends Component {
                                     <WorkClock />
                                 </Paper>
                             </Grid>
-                            {/* Timer Series Chart*/}
+                            {/* Time Series Chart*/}
                             <Grid item xs={12} md={8} lg={9}>
                                 <Paper className={fixedHeightPaper}>
-                                    <span> { state } </span>
+                                    <TimeSeriesChart data={this.state.chartData}/>
                                 </Paper>
                             </Grid>
                             {/* Statistics */}
                             <Grid item xs={12} md={4} lg={3}>
                                 <Paper className={fixedHeightPaper}>
-                                    <span> { state } </span>
+                                    <Typography component="h2" variant="h2" color="primary" align="left">
+                                        { Math.round(this.state.weekHours * 100) / 100 }
+                                    </Typography>
+                                    <Title> Hours Worked <br/> This Week </Title>
                                 </Paper>
                             </Grid>
                             {/* Timesheet */ }

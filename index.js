@@ -175,6 +175,34 @@ app.route('/api/timesheet/:rowid([0-9]+)')
         })
     })
 
+app.get('/api/statistics', (req,res) => {
+    var today = new Date();
+    today.setHours(0); today.setMinutes(0);
+    var week = 7 * 24 * 60 * 60 * 1000;
+    var lastMonday = new Date(today.getTime() - week);
+    while (lastMonday.getDay() != 1) {
+        lastMonday = new Date(lastMonday.getTime() + 24 * 60 * 60 * 1000);
+    }
+    db.all("SELECT rowid, * FROM timesheet WHERE start > $lastMonday ORDER BY start DESC", {
+        $lastMonday: lastMonday,
+    }, (err, rows) => {
+        var duration = 0;
+        var data = {}
+        rows.map(row => {
+            duration = duration + (row.end - row.start);
+            var day = new Date(row.start);
+            var dayKey = day.toDateString();
+            if (dayKey in data) {
+                data[dayKey] += duration;
+            } else {
+                data[dayKey] = duration;
+            }
+        })
+        var hours = duration / (60 * 60 * 1000);
+        res.json({result: 1, hours: hours, duration: duration, rows: rows, data: data});
+    })
+})
+
 // Handles any requests that don't match the ones above
 app.get('*', (req,res) =>{
     res.sendFile(path.join(__dirname+'/client/build/index.html'));
