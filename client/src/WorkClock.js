@@ -85,7 +85,7 @@ class WorkClock extends Component {
         })
             .then(response => response.json())
             .then(data => {
-                this.props.refreshApp();
+                // console.log(data);
             })
     }
 

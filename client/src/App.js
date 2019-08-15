@@ -70,9 +70,7 @@ const useStyles = theme => ({
 
 
 const API = 'http://localhost:8000/api';
-// const DEFAULT_QUERY = '/timesheet/create?hey=1&jeff=2';
 const TIMER_QUERY = '/timer'
-const TIMESHEET_QUERY = '/timesheet'
 
 class App extends Component {
 
@@ -80,14 +78,11 @@ class App extends Component {
     constructor(props) {
         super(props);
         
-        this.refresh = false;        
         this.state = {
             timerState: 'hey :)',
             startTime: new Date(),
-            timesheet: [],
         };
 
-        this.refreshApp = this.refreshApp.bind(this);
     }
 
     componentDidMount() {
@@ -97,32 +92,14 @@ class App extends Component {
                 if (data.state !== this.state.timerState) {
                     this.setState({
                         timerState: data.state,
-                    })   
-                }
-            }), 1000);
-        
-        fetch(API + TIMESHEET_QUERY)
-            .then(response => response.json())
-            .then(data => {
-                if (data.result === 1) {
-                    this.setState({
-                        timesheet: data.rows,
                     })
                 }
-            })
+            }), 1000);
     }
 
     componentWillUnmount() {
         clearInterval(this.interval);
     }
-
-
-    refreshApp() {
-        this.refresh = true;
-        this.forceUpdate();
-        this.refresh = false;
-    }
-        
 
     render() {
         const state = this.state.timerState;
@@ -146,7 +123,7 @@ class App extends Component {
                             {/* Work Clock */ }
                             <Grid item xs={12}>
                                 <Paper className={classes.paper}>
-                                    <WorkClock refreshApp={this.refreshApp}/>
+                                    <WorkClock />
                                 </Paper>
                             </Grid>
                             {/* Timer Series Chart*/}
@@ -164,7 +141,7 @@ class App extends Component {
                             {/* Timesheet */ }
                             <Grid item xs={12}>
                                 <Paper className={classes.paper}>
-                                    <Timesheet data={this.state.timesheet} classes={classes} refresh={this.refresh}/>
+                                    <Timesheet classes={classes} />
                                 </Paper>
                             </Grid>
                         </Grid>

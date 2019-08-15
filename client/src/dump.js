@@ -65,3 +65,31 @@
         }}
         margin="normal"
       />
+
+
+
+                // <TextField
+                //     disabled
+                //     id="standard-disabled"
+                //     value={duration}
+                //     className={classes.textField}
+                //     margin="normal"
+                // />
+
+
+
+
+
+
+{
+"result":1,
+"rows":[
+{"rowid":5,
+"start":"Wed Aug 14 2019 04:00:50 GMT-0700 (Pacific Daylight Time)stop=Wed Aug 14 2019 04:20:50 GMT-0700 (Pacific Daylight Time)rating=nulltasks=null",
+"end":null,
+"tasks":null,
+"rating":null}, 
+
+
+
+{"rowid":4,"start":1565780005986,"end":1565780093006,"tasks":null,"rating":null},{"rowid":3,"start":1565686397654,"end":1565688968352,"tasks":null,"rating":null}]}

@@ -24,8 +24,8 @@ function timerHandler(action) {
         case states.WORKING.END:
             // End the work timer and log new entry
             db.run("INSERT INTO timesheet VALUES ($start, $end, $tasks, $rating)", {
-                $start: timer,
-                $end: new Date(),
+                $start: timer.getTime(),
+                $end: new Date().getTime(),
                 $tasks: null,
                 $rating: null,
             }, function(err) {

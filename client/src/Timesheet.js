@@ -9,23 +9,11 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import TextField from '@material-ui/core/TextField';
-
-
 import IconButton from '@material-ui/core/IconButton';
-import EditIcon from '@material-ui/icons/Edit';
-import DeleteIcon from '@material-ui/icons/Delete';
 import AddAlarmIcon from '@material-ui/icons/AddAlarm'
-import SaveIcon from '@material-ui/icons/Save'
-import CancelIcon from '@material-ui/icons/Cancel'
-
-
 
 import Title from './Title';
 import EditableTableRow from './EditableTableRow';
-
 
 
 const API = 'http://localhost:8000/api';
@@ -42,10 +30,18 @@ class Timesheet extends Component {
         }
         
         this.sendDeleteRequest = this.sendDeleteRequest.bind(this);
+        this.sendUpdateRequest = this.sendUpdateRequest.bind(this);
+        this.sendCreateRequest = this.sendCreateRequest.bind(this);
+        this.refreshTimesheet = this.refreshTimesheet.bind(this);
     }
 
     componentDidMount() {
+        this.refreshInterval = setInterval(this.refreshTimesheet, 500);
         this.refreshTimesheet();
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.refreshInterval);
     }
 
     refreshTimesheet() {
@@ -60,6 +56,28 @@ class Timesheet extends Component {
             })
     }
 
+    sendUpdateRequest(rowid, start, end, rating, tasks) {
+        console.log(start, end)
+        if ( !start || !end ) {
+            console.log('invalid!')
+            return;
+        }
+        fetch(API + TIMESHEET_QUERY + '/' + rowid + '?'
+            + 'start=' + encodeURIComponent(start) + '&'
+            + 'end=' + encodeURIComponent(end) + '&'
+            + 'rating=' + encodeURIComponent(rating) + '&'
+            + 'tasks=' + encodeURIComponent(tasks)
+        , {
+            method: 'post'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 1) {
+                    this.refreshTimesheet();
+                }
+            })
+    }
+
     sendDeleteRequest(rowid) {
         fetch(API + TIMESHEET_QUERY + '/' + rowid, {
             method: 'delete',
@@ -67,44 +85,36 @@ class Timesheet extends Component {
             .then(response => response.json())
             .then(data => {
                 if (data.result === 1) {
-                    this.refreshTimesheet()
+                    this.refreshTimesheet();
                 }
             })
     }
 
-    tableClick(row,column,event) {
-        // console.log(row, column, event);
+    sendCreateRequest() {
+        var start = new Date(), end = new Date();
+        fetch(API + TIMESHEET_QUERY + '?'
+            + 'start=' + encodeURIComponent(start) + '&'
+            + 'end=' + encodeURIComponent(end) + '&'
+            + 'rating=' + encodeURIComponent('') + '&'
+            + 'tasks=' + encodeURIComponent('')
+        , {
+            method: 'post'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 1) {
+                    this.refreshTimesheet();
+                }
+            })
     }
 
-    actionButtons(editing, classes) {
-        if (editing) {
-            return (
-                <React.Fragment>
-                    <IconButton color={'primary'} className={classes.button} aria-label="delete">
-                        <SaveIcon />
-                    </IconButton>
-                    <IconButton color={'secondary'} className={classes.button} aria-label="delete">
-                        <DeleteIcon />
-                    </IconButton>
-                    <IconButton color={'default'} className={classes.button} aria-label="delete">
-                        <CancelIcon />
-                    </IconButton>
-                </React.Fragment>
-            )
-        } else {
-            return (
-                <IconButton color={'primary'} className={classes.button} aria-label="delete">
-                    <EditIcon />
-                </IconButton>
-            )
-        }
+    refresh() {
+        this.setState({
+            refresh: !this.state.refresh,
+        })
     }
 
     render() {
-
-        if (this.props.refresh) {
-            this.refreshTimesheet();            
-        }
 
         const { classes } = this.props;
 
@@ -116,7 +126,7 @@ class Timesheet extends Component {
                     </Grid>
                 </Grid>
 
-                <Table size="medium" onClick={this.tableClick}>
+                <Table size="large" onClick={this.tableClick}>
                     <TableHead>
                         <TableRow>
                             <TableCell>Date</TableCell>
@@ -126,7 +136,7 @@ class Timesheet extends Component {
                             <TableCell>Rating</TableCell>
                             <TableCell>Task(s)</TableCell>
                             <TableCell align="right">
-                                <IconButton color={'primary'} className={classes.button} aria-label="delete">
+                                <IconButton color={'primary'} className={classes.button} aria-label="delete" onClick={this.sendCreateRequest}>
                                     <AddAlarmIcon />
                                 </IconButton>
                             </TableCell>
@@ -136,7 +146,7 @@ class Timesheet extends Component {
                         {
                             this.state.timesheet.map(row => {
                                 return (
-                                    <EditableTableRow row={row} classes={classes} delete={this.sendDeleteRequest}/>
+                                    <EditableTableRow key={row.rowid} row={row} classes={classes} delete={this.sendDeleteRequest} update={this.sendUpdateRequest} />
                                 )
                             })
                         }
