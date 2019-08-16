@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon -I index.js",
+    "start": "node index.js",
+    "watch": "nodemon -I index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Neil Toledo (neeull2@gmail.com)",
