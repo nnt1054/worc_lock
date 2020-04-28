@@ -12,9 +12,9 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.1",
-    "sqlite3": "^4.0.9"
+    "sqlite3": "^4.2.0"
   },
   "devDependencies": {
-    "nodemon": "^1.19.1"
+    "nodemon": "^1.19.4"
   }
 }
